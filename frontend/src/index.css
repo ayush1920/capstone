@@ -1,0 +1,340 @@
+body {
+  font-family: "Source Sans Pro", "Calibri", "sans-serif";
+
+  font-size: inherit;
+  font-weight: normal;
+  line-height: inherit;
+  margin: 0px;
+  padding: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  margin: 0px;
+  padding: 0px;
+  height: 100vh;
+  width: 100vw;
+}
+
+:root {
+  --ui-color: #893dff;
+  --ui-color-dark: #411d7a;
+  --ui-color-light: #F5EFFF
+}
+
+.navbar-custom {
+  display: flex;
+  background-color: white;
+  z-index:10;
+  min-height: 60px;
+  padding: 10px 20px;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 2px solid #411d7a;
+  user-select: none;
+}
+
+.navbar-links-container {
+  display: flex;
+  width: max-content;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.navbar-logo {
+  border-bottom: 5px solid var(--ui-color);
+  height: min-content;
+  display: inline-block;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.navbar-link {
+  color: var(--ui-color-dark);
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.navbar-link:hover {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--ui-color-dark);
+}
+
+.navbar-link.selected {
+  font-weight: 600;
+  border-bottom: 3px solid var(--ui-color);
+  color: var(--ui-color-dark);
+  text-decoration: none;
+}
+
+.navbar-link.selected:hover {
+  text-decoration: none;
+}
+
+.notifier {
+  z-index : 6;
+  position: absolute;
+  transform: translate(0, -100%);
+  height: 30px;
+  top:82px;
+  left:10px;
+  right: 10px;
+  background-color: #FFC265;
+  font-size: large;
+  font-weight: bolder;
+  border-radius: 0px 0px 5px 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease-in;
+}
+
+.notifier.show {
+  transform: translate(0, 0);
+  transition: transform 0.2s ease-in;
+}
+
+.navbar-user-button{
+  border:2px solid var(--ui-color-dark);
+  color: var(--ui-color-dark);
+  outline:none;
+  background-color: transparent;
+  border-radius: 4px;
+  min-width: 100px;
+  min-height: 40px;
+  text-align: left;
+}
+/* DropDown Style starts Here*/
+/* https://www.w3schools.com/css/css_dropdowns.asp */
+
+.dropbtn {
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  display: inline;
+  right:20px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  width: 100%;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--amadeus-color-light-medium);
+  z-index: 7;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.page-wrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+.page-container{
+  display: flex;
+  flex-direction: column;
+  flex:1;
+  justify-content: flex-start;
+  align-items: center;
+  justify-self: stretch;
+
+}
+
+/* LoginPage  styling starts Here*/
+
+.login-div {
+  display: flex;
+  align-self: stretch;
+  margin: 2% 2%;
+  min-width: 320px;
+  flex-direction: column;
+  box-shadow: 0px 0px 5px -2px grey;
+  border-radius: 5px;
+  padding: 30px 20px 20px 20px;
+  background-color: white;
+  animation: 0.4s ease-out 0s 1 slideInFromLeft;
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-20%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.inp-container {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.inp-label {
+  font-size: 0.92rem;
+  color: #545454;
+}
+
+input.custom-und {
+  font-size: 1.1rem;
+  width: auto;
+  border: 0px;
+  outline: none;
+  border-bottom: 2px solid #adadad;
+}
+
+input.custom-und:focus {
+  border-bottom: 2px solid #1e1e1e;
+}
+
+button.custom-purple {
+  background-color: var(--ui-color);
+  color: white;
+  outline: none;
+  border: 1px solid var(--ui-color);
+  border-radius: 3px;
+  min-width: 100px;
+  width: max-content;
+  height: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+button.custom-purple:hover {
+  background-color: white;
+  color: var(--ui-color);
+  transition: all ease-out 0.2s;
+}
+
+button.custom-purple:active {
+  transform: scale(0.97);
+}
+
+button.custom-purple-reverse {
+  background-color: white;
+  color: var(--ui-color);
+  outline: none;
+  border: 1px solid white;
+  border-radius: 3px;
+  min-width: 100px;
+  width: max-content;
+  height: 40px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+button.custom-purple-reverse:hover {
+  background-color: var(--ui-color);
+  color: white;
+  transition: all ease-out 0.2s;
+}
+
+button.custom-purple-reverse:active {
+  transform: scale(0.97);
+}
+
+
+.btn-google {
+  background-color: transparent;
+  color: #ea4335;
+  outline: none;
+  border: 1px solid #ea4335;
+  border-radius: 3px;
+  min-width: 100px;
+  width: max-content;
+  height: 40px;
+}
+
+.btn-google:hover {
+  background-color: #f9c4bf;
+  color: white;
+  transition: all ease-out 0.2s;
+}
+
+.btn-google:active {
+  transform: scale(0.97);
+}
+
+.login-button-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.login-container-div {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 95%;
+  width: 90%;
+  margin: 10px 15px 10px 15px;
+  background-color: #fcfcfc;
+  border-radius: 5px;
+  box-shadow: 0px 0px 4px -2px black;
+}
+
+/* CandidateDashBoard style start here */
+
+@keyframes slideInFromBottom {
+  0% {
+    transform: translateY(15%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.interview-list-container{
+  margin-top:10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.interview-item{
+  border: 2px solid var(--ui-color-dark);
+  border-radius: 5px;
+  padding: 10px;
+  font-size: large;
+  margin-bottom: 20px;
+  width: 90%;
+  user-select: none;
+  background-color: var(--ui-color-light);
+  animation: slideInFromBottom .2s  ease-in 0s 1;
+}
+
+.interview-details{
+  display: grid;
+  grid-template-columns: max-content max-content ;
+  column-gap: 20px;
+  row-gap: 10px;
+  align-items: center;
+}
