@@ -7,6 +7,7 @@ import CandiateDashBoard from '../pages/CandiateDashBoard'
 
 const PageManager = (props) => {
     const { loggedIn, isInterviewer } = useSelector(state => state.mainReducer);
+
     switch (props.pageName) {
         case 'HOME': {
             if (loggedIn) {

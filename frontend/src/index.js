@@ -12,6 +12,8 @@ import CandidateJobs from './pages/CandidateJobs';
 import CandidateProfile from './pages/CandidateProfile';
 import InterviewerPosts from './pages/InterviewerPosts';
 import InterviewerCandProfile from './pages/InterviewerCandProfile';
+import InterviewerOpening from './pages/InterviewerOpening';
+import CandidateJobDetails from './pages/CandidateJobDetails';
 
 const root = createRoot(
   document.getElementById('root')
@@ -22,7 +24,7 @@ root.render(
     <Provider store={store} >
       <Router>
         <Routes>
-          
+
           <Route exact path='/' element={
             <ProtectedRoutes>
               <PageManager pageName='HOME' />
@@ -33,19 +35,30 @@ root.render(
               <CandidateJobs />
             </ProtectedRoutes>} />
 
-            <Route exact path='/profile' element={
+          <Route exact path='/profile' element={
             <ProtectedRoutes>
               <CandidateProfile />
             </ProtectedRoutes>} />
 
-            <Route exact path='/postedJobs' element={
+          <Route exact path='/postedJobs' element={
             <ProtectedRoutes>
               <InterviewerPosts />
             </ProtectedRoutes>} />
 
-            <Route exact path='/cand_profile' element={
+          <Route exact path='/cand_profile' element={
             <ProtectedRoutes>
               <InterviewerCandProfile />
+            </ProtectedRoutes>} />
+
+          <Route exact path='/candidateJobDetails' element = {
+            <ProtectedRoutes>
+              <CandidateJobDetails />
+            </ProtectedRoutes>
+          } />
+
+            <Route exact path='/postOpening' element={
+            <ProtectedRoutes>
+              <InterviewerOpening />
             </ProtectedRoutes>} />
 
         </Routes>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Footer from '../Components/Footer';
 import Navbar, { linkList } from '../Components/Navbar';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getInterviewerOpenings } from '../js/httpHandler';
+import { formatRupee } from '../js/utils';
 
 const InterviewerPosts = () => {
   const [openingList, updateOpeningList] = useState([]);
@@ -40,7 +41,8 @@ const InterviewerPosts = () => {
             openingList.map((item, index) => {
 
               return (
-                <OpeningItem key={index} role={item.role} salary={item.salary} applied={item.applied} />
+                <OpeningItem key={index} role={item.designation} salary={item.salary} 
+                location = {item.location} applied={item.applied} job_id = {item._id} />
               )
             })
           }
@@ -53,15 +55,20 @@ const InterviewerPosts = () => {
 
 
 const OpeningItem = (props) => {
-  const { role, salary, applied } = props
+  const { role, salary, location, applied, job_id } = props
   const [showCandidates, setShowCandidates] = useState(false);
   const navigate = useNavigate();
+
+  const showMoreDetails = () => {
+    navigate('/postOpening', {state: {'_id': job_id}})
+  }
 
   return (
     <div className='interview-item'>
       <div className='interview-details'>
-        <div>Role:</div> <b>{role}</b>
-        <div>Salary:</div> <b>{salary}</b>
+        <div>Designation:</div> <b>{role}</b>
+        <div>Location:</div> <b>{location}</b>
+        <div>Salary:</div> <b>{formatRupee(salary)}</b>
         {
           showCandidates && applied.map((candidateName, index2) => {
             return (
@@ -70,7 +77,7 @@ const OpeningItem = (props) => {
                 <div>
                   {candidateName}
                   <button className='custom-purple-reverse' style={{ height: '30px', marginLeft: '10px' }} onClick={() => {
-                    return navigate('/cand_profile', { state: { username: candidateName } });
+                    return navigate('/cand_profile', { state: { username: candidateName, job_id: job_id, role:role } });
                   }}> Show Candidate Profile</button></div>
 
               </React.Fragment>
@@ -79,8 +86,10 @@ const OpeningItem = (props) => {
         }
       </div>
 
+      <button className='custom-blue-reverse' style={{ float: 'right', marginRight: '20px' }} onClick={showMoreDetails}> Show More Details</button>
       {<button className='custom-purple' style={{ float: 'right', marginRight: '20px' }} onClick={() => { setShowCandidates(!showCandidates) }}>
         {(showCandidates) ? 'Hide Applied Candidates' : 'Show Applied Candidates'}({applied.length})</button>}
+
 
     </div>)
 }

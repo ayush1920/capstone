@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
-import { useIsMount } from '../js/utils'
+import { useIsMount, useLogout } from '../js/utils'
 import store from '../redux/store'
-import { logOut } from '../redux/actions/actions';
-
 
 const Navbar = (props) => {
-    const [name, setName] = useState('    ');
+    const [Username, setName] = useState('    ');
     const [pageLinks, updatePageLinks] = useState([]);
     const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
-    const dispath = useDispatch();
+    const signOutUser = useLogout();
 
     useEffect(() => {
-        let { username, loggedIn, isInterviewer } = store.getState().mainReducer
+        let { name, loggedIn, isInterviewer } = store.getState().mainReducer
         const accessLevel = (isInterviewer) ? 'INTERVIEWER' : 'CANDIDATE';
-        setName(username);
+        setName(name);
         setLoggedIn(loggedIn);
         highlightSelectedPage(props.selectedPage, accessLevel, loggedIn)
     }, [])
@@ -39,16 +37,9 @@ const Navbar = (props) => {
 
         updatePageLinks(finalLinkList);
     }
-
-    const signOutUser = () => {
-        // https://stackoverflow.com/a/27374365
-        document.cookie.split(";").forEach(function (c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
-        dispath(logOut());
-        navigate('/');
-    }
-
+    
     return (
-        <>
+        <div style={{position:'relative', zIndex:5}}>
             <div className='navbar-custom'>
                 <div className='navbar-logo' onClick={() => { navigate('/', { replace: true }) }}>
                     <span style={{ fontSize: '1.6rem', color: '#411D7A', fontWeight: "bold" }}>INTERVIEW.<span style={{ fontSize: '1rem', fontWeight: 'normal' }}> AI</span></span>
@@ -59,15 +50,14 @@ const Navbar = (props) => {
                 </div>
 
                 {loggedIn && <div className="dropdown">
-                    <button className='navbar-user-button'>{name}&nbsp;&nbsp;&#x2BC6;</button>
+                    <button className='navbar-user-button'>{Username}&nbsp;&nbsp;&#x2BC6;</button>
                     <div className="dropdown-content">
                         <button className='custom-purple-reverse' style={{ minWidth: '100%', borderColor: 'var(--background-light-color)' }} onClick={signOutUser}>Sign Out</button>
                     </div>
                 </div>}
-
             </div>
             <Notifier />
-        </>
+        </div>
 
     )
 }
@@ -76,23 +66,25 @@ export const linkList = {
     'HOME': { index: 0, text: 'Home', path: '/', access: 'ALL', loginRequired: false },
     'CANDIDATE_JOBS': { index: 1, text: 'Jobs', path: '/jobs', access: 'CANDIDATE', loginRequired: true },
     'CANDIDATE_PROFILE': { index: 2, text: 'Profile', path: '/profile', access: 'CANDIDATE', loginRequired: true },
-    'INTERVIEWER_POSTS': { index: 3, text: 'Posted Jobs', path: '/postedJobs', access: 'INTERVIEWER', loginRequired: true }
+    'INTERVIEWER_POSTS': { index: 3, text: 'Posted Jobs', path: '/postedJobs', access: 'INTERVIEWER', loginRequired: true },
+    'INTERVIEWER_NEW_OPENING': { index: 4, text: 'Openings', path: '/postOpening', access: 'INTERVIEWER', loginRequired: true }
 }
 
 Object.freeze(linkList)
 
 const Notifier = () => {
-    const message = useSelector(state => state.mainReducer.message);
+    const msgData = useSelector(state => state.mainReducer);
     const firstMount = useIsMount();
     const [className, setClassName] = useState('notifier');
 
     useEffect(() => {
-        if (!firstMount)
-            showMessage(message);
-    }, [message]);
+        if (!firstMount) {
+            showMessage();
+        }
+    }, [msgData]);
 
     const showMessage = () => {
-        setClassName('notifier show')
+        setClassName('notifier show');
         setTimeout(() => {
             setClassName('notifier')
         }, 5000);
@@ -100,7 +92,7 @@ const Notifier = () => {
 
     return (
         <div className={className}>
-            <span>{message}</span>
+            <span>{msgData.message}</span>
         </div>
     )
 };

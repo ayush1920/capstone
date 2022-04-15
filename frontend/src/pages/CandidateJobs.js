@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Footer from '../Components/Footer'
 import Navbar, { linkList } from '../Components/Navbar'
-import { getCandidateJobs, applyJob } from '../js/httpHandler'
+import { getCandidateJobs, applyJob, withdrawApplication } from '../js/httpHandler'
 import { useNavigate } from 'react-router-dom'
+import { formatRupee } from '../js/utils'
 
 const CandidateJobs = () => {
 
@@ -14,18 +15,27 @@ const CandidateJobs = () => {
         // https://stackoverflow.com/a/60619061
         const fetchJobDetails = async () => {
             const jobData = await getCandidateJobs();
-            console.log(jobData)
             updateJobsList(jobData);
         };
         fetchJobDetails();
     }, []);
 
 
-    const applyForJob = async(job_id) =>{
-        const response  = await applyJob(job_id);
-        
-        console.log('response', response);
-        if (response.status){
+    const applyForJob = async (job_id) => {
+        const response = await applyJob(job_id);
+        if (response.status) {
+            // Reload page
+            return navigate(0);
+        }
+    }
+
+    const showJobDetails = (job_id) => {
+        navigate('/candidateJobDetails', {state: { _id: job_id } })
+    }
+
+    const withdrawJobApplication = async (job_id) => {
+        const response = await withdrawApplication(job_id);
+        if (response.status) {
             // Reload page
             return navigate(0);
         }
@@ -43,12 +53,14 @@ const CandidateJobs = () => {
                             return (
                                 <div className='interview-item' key={index}>
                                     <div className='interview-details'>
-                                        <div>Role:</div> <b>{item.role}</b>
+                                        <div>Role:</div> <b>{item.designation}</b>
                                         <div>Company Name:</div><b>{item.lister}</b>
-                                        <div>Salary:</div> <b>{item.salary}</b>
+                                        <div>Salary:</div> <b>{formatRupee(item.salary)}</b>
                                         <div>Status:</div> <b>{(item.applied) ? 'Applied' : 'Not Applied'}</b>
                                     </div>
-                                {(!item.applied) && <button className='custom-purple' style={{ float: 'right', marginRight:'20px' }} onClick={()=>{applyForJob(item.job_id)}}> Apply for Position</button>}
+                                    {(!item.applied) && <button className='custom-purple' style={{ float: 'right', marginRight: '20px' }} onClick={() => { applyForJob(item._id) }}> Apply for Position</button>}
+                                    {(item.applied) && <button className='custom-purple' style={{ float: 'right', marginRight: '20px' }} onClick={() => { withdrawJobApplication(item._id) }}> Withdraw Application</button>}
+                                    {<button className='custom-blue-reverse' style={{ float: 'right', marginRight: '20px' }} onClick={() => { showJobDetails(item._id) }}> Show Job Details</button>}
                                 </div>)
                         })
                     }

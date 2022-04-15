@@ -22,7 +22,7 @@ const LoginPage = () => {
         const username = userRef.current.value;
         const password = userRef.current.value;
         const userDetails = {username: username, password: password};
-        const candidate_cred = {username: 'candidate', password: 'cand@123'};
+        const candidate_cred = {username: 'hari_vilas', password: 'hari@123'};
         const company1_cred = {username: 'company1', password: 'comp1@123'};
         const company2_cred = {username: 'company2', password: 'comp2@123'};
         loginUser(company1_cred, dispatch, notifier, navigate);

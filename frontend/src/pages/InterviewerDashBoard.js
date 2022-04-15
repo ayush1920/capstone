@@ -14,7 +14,6 @@ const InterviewerDashBoard = () => {
         // https://stackoverflow.com/a/60619061
         const fetchInterviewDetails = async () => {
             const interviewData = await getCompanyInterview();
-            console.log(interviewData)
             updateInterviewList(interviewData);
         };
         fetchInterviewDetails();
@@ -24,7 +23,7 @@ const InterviewerDashBoard = () => {
         let setValue = !(isEnabled);
         setValue = setValue.toString();
         const response  = await setInterviewStatus(_id, setValue);
-        console.log(response);
+
         if (response.status){
             // Reload page
             return navigate(0);

@@ -6,14 +6,14 @@ export const notify = (msg) =>{
 }
 
 export const updateLogin = (data) =>{
-    const payload = {username: data.username, isInterviewer: data.interviewer, loggedIn:true}
+    const payload = {username: data.username, isInterviewer: data.interviewer, loggedIn:true, name:data.name}
     return {
         type: 'UPDATE_USER_DETAILS',
         payload: payload,
     }
 }
 
-export const logOut = () =>{
+export const clearUserCred = () =>{
     const payload = {username:'', isInterviewer:false, loggedIn: false}
     return {
         type: 'UPDATE_USER_DETAILS',

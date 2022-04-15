@@ -15,7 +15,6 @@ const CandiateDashBoard = () => {
         // https://stackoverflow.com/a/60619061
         const fetchInterviewDetails = async () => {
             const candidateData = await getCandidateInterview();
-            console.log(candidateData)
             updateInterviewList(candidateData);
         };
         fetchInterviewDetails();

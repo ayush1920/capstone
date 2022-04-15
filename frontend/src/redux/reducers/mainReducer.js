@@ -3,6 +3,7 @@ const initialState = {
     loggedIn: false,
     isInterviewer: false,
     username:'',
+    name:'',
 }
 
 const mainReducer = (state = initialState, actions) => {

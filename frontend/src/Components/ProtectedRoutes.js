@@ -1,34 +1,38 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useLocation} from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import store from '../redux/store';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { updateLogin } from '../redux/actions/actions';
+import { useLogout } from '../js/utils';
 
-const ProtectedRoutes = ({children}) =>{
-    const {state} = useLocation();
+const ProtectedRoutes = ({ children }) => {
+    const { state } = useLocation();
     const dispatch = useDispatch();
-    const {loggedIn} = useSelector(state => state.mainReducer);
+    const signOutUser = useLogout();
+
+    const { loggedIn } = store.getState().mainReducer;
     if (loggedIn)
         return children;
     // If user is logged in redirect to page
 
 
-    // If disable redirect show childrent.
+    // If redirect is disabled in state, show childrens.
     // Mostly used in case to show login pasge without verifying whether user has logged in or not.
-
-    if (state && state.disableRedirect){
-        return children;
-    }  
-
-    const value = ('; '+document.cookie).split(`; session=`).pop().split(';')[0];
     
+    if (state && state.disableRedirect) {
+        return children;
+    }
+
+    const isCookieAvailable = ((document.cookie.split('=').findIndex((item) => item === 'session')) !== -1)
+    let usercred = localStorage.getItem('session');
     // Cookie not available, redirect to login page and disable further redirect.
-    if (!value){
-        return <Navigate to='/' state={{disableRedirect: true}}/>
+    if (!(usercred && isCookieAvailable)) {
+        signOutUser();
     }
 
     // Cookie available use cookie to update redux.
-    var usercred = JSON.parse(atob(value.split('.')[0]));
+    usercred = JSON.parse(usercred);
     dispatch(updateLogin(usercred));
     return children;
 }
