@@ -820,7 +820,6 @@ button.custom-blue-reverse:active {
   justify-content: flex-start;
   align-items: flex-start;
   gap: 5px;
-  border: 2px solid #007fd4aa;
   border-radius: 4px;
 }
 

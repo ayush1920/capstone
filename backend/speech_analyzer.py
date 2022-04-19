@@ -7,6 +7,7 @@ import speech_recognition as sr
 
 from utils import cprint
 
+
 def video_to_text(file_path):
     audio_path = f'uploads\\{uuid1()}.wav'
     text_file_path = f'uploads\\{uuid1()}.txt'
@@ -23,7 +24,7 @@ def video_to_text(file_path):
             text = r.recognize_google(audio)
         except sr.UnknownValueError:
             text = ''
-            
+
         with open(text_file_path, "w+") as file:
             file.write(text)
             speech_text.append(text)
@@ -65,14 +66,14 @@ def pause_detection(audio_path):
     total_time = nonMuteSections[-1][-1] / sr
 
     initial_pause = nonMuteSections[0][0] / sr
-    initial_pause_percent = initial_pause *100 / total_time
+    initial_pause_percent = initial_pause * 100 / total_time
 
     mute = nonMuteSections[0][0]
     for i in range(1, len(nonMuteSections)):
         mute += (nonMuteSections[i][0] - nonMuteSections[i - 1][1])
     mute = mute / sr
 
-    mute_percent = (mute *100) / total_time
+    mute_percent = (mute * 100) / total_time
 
     return initial_pause_percent, mute_percent
 

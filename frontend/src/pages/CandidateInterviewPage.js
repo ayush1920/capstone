@@ -13,7 +13,6 @@ const CandidateInterviewPage = ({ interview_id }) => {
     const notifier = useNotifier();
 
     const send_blobs = async (blob_data) => {
-        console.log(streamId)
         if (streamId) {
             sendBlobData(notifier, streamId, blob_data)
         } else {
@@ -44,7 +43,6 @@ const CandidateInterviewPage = ({ interview_id }) => {
             .then(async (permissionObj) => {
                 setPermissionGranted(true);
                 videoFrameRef.current.srcObject = permissionObj;
-
                 const _streamId = await getStreamId(notifier, interview_id);
                 if (_streamId) {
                     setStreamId(_streamId);

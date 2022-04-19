@@ -20,7 +20,7 @@ const LoginPage = () => {
 
     const login = () =>{
         const username = userRef.current.value;
-        const password = userRef.current.value;
+        const password = passRef.current.value;
         const userDetails = {username: username, password: password};
         const candidate_cred = {username: 'hari_vilas', password: 'hari@123'};
         const company1_cred = {username: 'company1', password: 'comp1@123'};

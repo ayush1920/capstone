@@ -39,12 +39,12 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
     const sourceRef = useRef();
     const videoRef = useRef();
 
-    useEffect(() =>{
-        if (sourceRef.current.src && videoRef.current){
+    useEffect(() => {
+        if (sourceRef.current.src && videoRef.current) {
             sourceRef.current.src = `http://localhost:5000/getInterviewVideo?file_path=${videoPath}`
             videoRef.current.load();
         }
-           
+
     }, [videoPath])
 
     useEffect(() => {
@@ -65,8 +65,8 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
 
 
     const [interviewAnalStarted, setInterviewAnalStarted] = useState(false);
-    const [audioCompleted, setAudioCompleted] = useState(false);
-
+    const [audioStarted, setAudioStarted] = useState(false);
+    const [audioCompleted, setAudioCompleted] = useState(false)
     const [candidateProfile, updateCandidateProfile] = useState({
         profile_image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png',
         first_name: '',
@@ -153,7 +153,6 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
                         setAnalysisProgress(response.result)
                         setIntervalRunning(false);
                         clearInterval(_intervalCounter);
-                        analizeAudio();
                     }
                     else if (response.status == 'Failed') {
                         console.error('Task failed in server');
@@ -188,7 +187,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
 
             // Main intervel. Runs every 2 second to check for job status.
             const _intervalCounter = setInterval(async () => {
-                setInterviewAnalStarted(true);
+                setAudioStarted(true);
                 const response = await getTaskStatus(notifier, task_id);
 
                 if (!(response && response.status)) {
@@ -222,7 +221,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
             <Navbar selectedPage={linkList.HOME} />
             <div className='page-container'>
                 <div className='sample-interview-div'>
-                    <button className='custom-blue-reverse' onClick={()=>{setVideoPath('uploads/sample.mp4'); console.log(videoPath)}}>Load Sample Interview</button>
+                    <button className='custom-blue-reverse'  onClick={() => { setVideoPath('uploads/sample.mp4')}}>Load Sample Interview</button>
                 </div>
                 <div className='profile-orverview'>
 
@@ -238,7 +237,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
                 <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#42A0DF' }}> Candidate Interview Recording</span>
                 <div className='video-container visible' style={{ border: '2px solid black', marginTop: '20px' }}>
                     <video width='480' height='360' controls ref={videoRef}>
-                        <source src={`http://localhost:5000/getInterviewVideo?file_path=${videoPath}`} ref = {sourceRef}/>
+                        <source src={`http://localhost:5000/getInterviewVideo?file_path=${videoPath}`} ref={sourceRef} />
                     </video>
                 </div>
 
@@ -249,7 +248,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
                     </div>
 
                     <div className='job-control-container' style={{ alignSelf: 'flex-start', width: '100%' }}>
-                        {isResumeUploaded() && <button className='custom-blue' onClick={analizeResume}> Analize resume</button>}
+                        {isResumeUploaded() && <button className='custom-blue' style={{width:'130px'}} onClick={analizeResume}> Analize resume</button>}
                         {
                             (resumeAnalysisText) &&
                             <div className='resume-analysis-score'>
@@ -259,7 +258,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
                     </div>
 
                     <div className='job-control-container' style={{ alignSelf: 'flex-start', width: '100%' }}>
-                        <button className='custom-blue' onClick={analizeInterview}> Analize Interview</button>
+                        <button className='custom-blue' style={{width:'130px'}} onClick={analizeInterview}> Analize Interview</button>
                         {
                             (interviewAnalStarted) &&
                             <div className='interview-analysis'>
@@ -270,7 +269,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
 
                                 <div className='emoji-container' >
                                     <img height={60} width={60} src={happy_image} />
-                                    <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.Happy}</span>
+                                    <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.ha}</span>
 
                                     <img height={38} width={38} src={neutral_image} />
                                     <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.Neutral}</span>
@@ -299,52 +298,59 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
                                     <span style={{ color: 'red', fontSize: '1.3rem' }}>Video Score: </span>
                                     <span style={{ fontSize: '1.3rem' }}>{candidateScores.video_score}</span>
                                 </div>
-
-
-                                {
-                                    (percent === 100 && (!audioCompleted)) && <span> Analyzing Audio ...</span>
-                                }
-
-                                {
-                                    (percent === 100 && audioCompleted) &&
-                                    <div style={{ alignSelf: 'stretch' }}>
-                                        <div>
-                                            <span style={{ fontSize: '1.3rem', textDecoration: 'underlined' }} >Speech Analysis</span>
-                                        </div>
-
-                                        <div className='audio-result-container'>
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> Speech Speed: <span style={{ color: 'black' }}> {candidateScores.audio_output.speed} </span></span>
-                                            </div>
-
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> WPM: <span style={{ color: 'black' }}> {candidateScores.audio_output.wpm} </span></span>
-                                            </div>
-
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> Initial Pause Percent: <span style={{ color: 'black' }}> {candidateScores.audio_output.initial_pause_percent} </span></span>
-                                            </div>
-
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> % Time not spoken: <span style={{ color: 'black' }}> {candidateScores.audio_output.mute_percent} </span></span>
-                                            </div>
-
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> Total Filler words used: <span style={{ color: 'black' }}> {candidateScores.audio_output.total_filler_words} </span></span>
-                                            </div>
-
-                                            <div>
-                                                <span style={{ fontSize: '1.1rem' }}> % Filler words used: <span style={{ color: 'black' }}> {candidateScores.audio_output.filler_percent} </span></span>
-                                            </div>
-                                        </div>
-                                        <span style={{ color: 'red', fontSize: '1.3rem' }}>Audio Score: </span>
-                                        <span style={{ fontSize: '1.3rem' }}>ABC</span>
-
-                                    </div>
-
-                                }
                             </div>
                         }
+                    </div>
+
+
+                    <div className='job-control-container' style={{ alignSelf: 'flex-start', width: '100%' }}>
+                        <button className='custom-blue'  onClick={analizeAudio} style={{width:'130px'}}> Analize Speech</button>
+
+                        {
+                            ((audioStarted && (!audioCompleted))) && <span style={{marginTop:'10px', color:'#411d7aaa', fontSize:'1.1rem', fontWeight:'600'}}> Analyzing Audio ...</span>
+                        }
+
+                        {
+                            (audioCompleted) &&
+                            <div className='interview-analysis' >
+                                <div style={{ alignSelf: 'stretch' }}>
+                                    <div>
+                                        <span style={{ fontSize: '1.3rem', textDecoration: 'underlined' }} >Speech Analysis</span>
+                                    </div>
+
+                                    <div className='audio-result-container'>
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> Speech Speed: <span style={{ color: 'black' }}> {candidateScores.audio_output.speed} </span></span>
+                                        </div>
+
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> WPM: <span style={{ color: 'black' }}> {candidateScores.audio_output.wpm} </span></span>
+                                        </div>
+
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> Initial Pause Percent: <span style={{ color: 'black' }}> {candidateScores.audio_output.initial_pause_percent} </span></span>
+                                        </div>
+
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> % Time not spoken: <span style={{ color: 'black' }}> {candidateScores.audio_output.mute_percent} </span></span>
+                                        </div>
+
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> Total Filler words used: <span style={{ color: 'black' }}> {candidateScores.audio_output.total_filler_words} </span></span>
+                                        </div>
+
+                                        <div>
+                                            <span style={{ fontSize: '1.1rem' }}> % Filler words used: <span style={{ color: 'black' }}> {candidateScores.audio_output.filler_percent} </span></span>
+                                        </div>
+                                    </div>
+                                    <span style={{ color: 'red', fontSize: '1.3rem' }}>Audio Score: </span>
+                                    <span style={{ fontSize: '1.3rem' }}>ABC</span>
+
+                                </div>
+                            </div>
+
+                        }
+
                     </div>
 
                 </div>

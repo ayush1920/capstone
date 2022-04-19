@@ -49,7 +49,7 @@ const OpeningItem = (props) => {
   const notifier = useNotifier();
 
   const showMoreDetails = () => {
-    navigate('/postOpening', { state: { '_id': job_id } })
+    navigate('/postOpening', { state: {props: { '_id': job_id } }})
   }
 
 

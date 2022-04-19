@@ -6,7 +6,7 @@ import { useNavigate, useLocation, use } from 'react-router-dom';
 import { modifyJob, deleteJob, getJobData } from '../js/httpHandler';
 import { useIsMount, useNotifier } from '../js/utils';
 
-const InterviewerNewOpening = () => {
+const InterviewerNewOpening = ({_id}) => {
     const notifier = useNotifier();
     const [isEditable, setEditable] = useState(true);
     const [jobIdAvailable, setjobIdAvailable] = useState(false);
@@ -43,7 +43,7 @@ const InterviewerNewOpening = () => {
 
     useEffect(() => {
         const loadJobData = async (job_id) => {
-            const response = await getJobData(job_id);
+            const response = await getJobData(notifier, job_id);
             if (Object.keys(response).length > 0) {
                 UpdateJobData(response)
                 disableEditing();
@@ -51,9 +51,8 @@ const InterviewerNewOpening = () => {
             }
 
         };
-
-        if (firstMount && location.state && location.state._id) {
-            loadJobData(location.state._id);
+        if (firstMount && _id) {
+            loadJobData(_id);
         };
 
     }, []);
