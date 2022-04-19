@@ -29,10 +29,11 @@ const CandidateProfile = () => {
             resume_location: '',
             profile_image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png',
         })
+    const notifier = useNotifier();
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const profileData = await getCandidateProfile();
+            const profileData = await getCandidateProfile(notifier);
             if (profileData.constructor === Array && profileData.length === 0)
                 return
             setUserData(profileData);
@@ -203,15 +204,15 @@ const ResumeDiv = (props) => {
     const [openFileSelector, { plainFiles }] = useFilePicker({
         accept: '.pdf',
     });
-    const notify = useNotifier();
+    const notifier = useNotifier();
     
     const saveResume = async () => {
         if (plainFiles.length !== 0) {
-            const response = await uploadCandidateResume(plainFiles[0]);
+            const response = await uploadCandidateResume(notifier, plainFiles[0]);
             console.log(response)
             if (response) {
                 updateUserData({ ...userData, resume_location: response });
-                notify('Resume updated successfully');
+                notifier('Resume updated successfully');
             }
         }
         setEditable(false);

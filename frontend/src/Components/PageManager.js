@@ -1,8 +1,10 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+
 import LoginPage from '../pages/LoginPage'
 import InterviewerDashBoard from '../pages/InterviewerDashBoard'
 import CandiateDashBoard from '../pages/CandiateDashBoard'
+import store from '../redux/store'
+import { useSelector } from 'react-redux'
 
 
 const PageManager = (props) => {

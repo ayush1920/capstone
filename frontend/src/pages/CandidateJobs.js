@@ -3,18 +3,19 @@ import Footer from '../Components/Footer'
 import Navbar, { linkList } from '../Components/Navbar'
 import { getCandidateJobs, applyJob, withdrawApplication } from '../js/httpHandler'
 import { useNavigate } from 'react-router-dom'
-import { formatRupee } from '../js/utils'
+import { formatRupee, useNotifier } from '../js/utils'
 
 const CandidateJobs = () => {
 
     const [jobsList, updateJobsList] = useState([]);
     const navigate = useNavigate();
+    const notifier = useNotifier();
 
     useEffect(() => {
         // Use effect renders twice
         // https://stackoverflow.com/a/60619061
         const fetchJobDetails = async () => {
-            const jobData = await getCandidateJobs();
+            const jobData = await getCandidateJobs(notifier);
             updateJobsList(jobData);
         };
         fetchJobDetails();
@@ -22,7 +23,7 @@ const CandidateJobs = () => {
 
 
     const applyForJob = async (job_id) => {
-        const response = await applyJob(job_id);
+        const response = await applyJob(notifier, job_id);
         if (response.status) {
             // Reload page
             return navigate(0);
@@ -34,7 +35,7 @@ const CandidateJobs = () => {
     }
 
     const withdrawJobApplication = async (job_id) => {
-        const response = await withdrawApplication(job_id);
+        const response = await withdrawApplication(notifier, job_id);
         if (response.status) {
             // Reload page
             return navigate(0);

@@ -1,11 +1,12 @@
 import json
 import os
 from bson.objectid import ObjectId
-from datetime import timezone
+from datetime import timezone, datetime
 from mongo import mongo
-from utils import cprint
+from utils import cprint, unique_id
 from pymongo.cursor import Cursor
 mongo = mongo.db
+
 
 def convert_cursor(crx):
     def format_result(x):
@@ -28,14 +29,13 @@ def authenticate_user(username, password):
     result = mongo.usercred.find_one(
         {'username': username, 'password': password}, {'password': 0, '_id': 0})
     if not result:
-        return {'isValid': False}, 401
+        return {'msg': 'Incorrent username or password'}, 401
 
-    return {'isValid': True, 'userData': convert_cursor(result)}, 200
+    return {'userData': convert_cursor(result), 'msg': 'login success'}, 200
 
 
 def get_interview_list(username):
-    result = mongo.interview_list.find({'interviewee': username}, {
-                                       '_id': 0}).sort('time', -1)
+    result = mongo.interview_list.find({'candidate': username}).sort('time', -1)
     result = convert_cursor(result)
     for res in result:
         res['time'] = int(res['time'].replace(
@@ -61,6 +61,16 @@ def set_interview_status(_id, status):
     mongo.interview_list.update_one({'_id': ObjectId(_id)}, {
                                     '$set': {'enabled': status}})
     return {'status': True}
+
+
+def set_interview_completed(_id):
+    file_path = mongo.interview_list.find_one({'_id': ObjectId(_id)})['filename']
+    if not file_path or not os.path.isfile(file_path):
+        return {'msg': 'No interview video file found. Cannot mark interview as complete.'}, 400
+
+    mongo.interview_list.update_one({'_id': ObjectId(_id)}, {
+                                    '$set': {'completed': True}})
+    return 'success'
 
 
 def get_job_list(username):
@@ -93,12 +103,12 @@ def withdraw_application(username, _id):
 
 def get_openings(username):
     result = mongo.job_list.find({'lister': username}, {
-                                 '_id': 1, 'location': 1, 'salary': 1, 'designation': 1, 'applied': 1})
+                                 '_id': 1, 'location': 1, 'salary': 1, 'designation': 1, 'applied': 1, 'lister': 1})
     return {'openings': convert_cursor(result)}
 
 
 def get_profile(username):
-    result = mongo.user_details.find_one({'username': username}, {'_id': 0})
+    result = mongo.user_details.find_one({'username': username})
     return {'profile': convert_cursor(result)}
 
 
@@ -143,11 +153,27 @@ def delete_job(username, job_id):
 
 
 def get_job_data(job_id):
-    result = mongo.job_list.find_one({'_id': ObjectId(job_id)} ,{'applied': 0})
-    return convert_cursor(result) 
+    result = mongo.job_list.find_one({'_id': ObjectId(job_id)}, {'applied': 0})
+    return convert_cursor(result)
 
 
 def process_resume(username, job_id):
-    resume_path = mongo.user_details.find_one({'username': username})['resume_location']
-    job_details = mongo.job_list.find_one({'_id': ObjectId(job_id)})['job_description']
+    resume_path = mongo.user_details.find_one(
+        {'username': username})['resume_location']
+    job_details = mongo.job_list.find_one({'_id': ObjectId(job_id)})[
+        'job_description']
     return resume_path, job_details
+
+
+def schedule_candidate_interview(payload):
+    payload['enabled'] = False
+    payload['completed'] = False
+    payload['time'] = datetime.fromtimestamp(payload['time'], tz = timezone.utc)
+    payload['filename'] = f'uploads/{unique_id()}.webm'
+    
+    if mongo.interview_list.find_one({'candidate': payload['candidate'],
+                                      'job_id': payload['job_id']}):
+        return 'Interview already scheduled'
+    
+    mongo.interview_list.insert_one(payload)
+    return f'Interview scheduled for candidate {payload["candidate"]}'

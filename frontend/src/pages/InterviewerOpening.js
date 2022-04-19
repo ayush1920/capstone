@@ -7,6 +7,7 @@ import { modifyJob, deleteJob, getJobData } from '../js/httpHandler';
 import { useIsMount, useNotifier } from '../js/utils';
 
 const InterviewerNewOpening = () => {
+    const notifier = useNotifier();
     const [isEditable, setEditable] = useState(true);
     const [jobIdAvailable, setjobIdAvailable] = useState(false);
     const [jobData, UpdateJobData] = useState({
@@ -91,7 +92,7 @@ const InterviewerNewOpening = () => {
             'job_description': refs.JOB_DESCRIPTION.current.value,
         }
 
-        const response = await modifyJob(payload);
+        const response = await modifyJob(notifier, payload);
         if (Object.keys(response).length !== 0) {
             UpdateJobData(response);
             setjobIdAvailable(true);
@@ -116,7 +117,7 @@ const InterviewerNewOpening = () => {
         if (jobData._id === '')
             return
 
-        const response = await deleteJob(jobData._id)
+        const response = await deleteJob(notifier, jobData._id)
         if (response !== '') {
             notify(response);
             setTimeout(() => {

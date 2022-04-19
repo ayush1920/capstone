@@ -213,11 +213,13 @@ input.input-default {
 
 .page-container {
   display: flex;
+  position: relative;
   flex-direction: column;
   flex: 1;
   justify-content: flex-start;
   align-items: center;
   justify-items: center;
+  gap: 10px;
 }
 
 /* LoginPage  styling starts Here*/
@@ -710,12 +712,12 @@ button.custom-blue-reverse:active {
   align-self: center;
   margin: 10px;
   border-radius: 10px;
-  background-color: #B0D4F448;
+  background-color: #b0d4f448;
   user-select: none;
 }
 
-.resume-analysis-score{
-  border: 2px solid #007FD4AA;
+.resume-analysis-score {
+  border: 2px solid #007fd4aa;
   display: flex;
   flex: 1;
   padding: 5px 10px;
@@ -725,7 +727,105 @@ button.custom-blue-reverse:active {
   border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #411d7aAA;
-  
+  color: #411d7aaa;
+}
+.alert-message {
+  background-color: #fff3cd;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 1.1rem;
 }
 
+.video-frame {
+  width: 480px;
+  height: 360px;
+}
+
+.video-container {
+  opacity: 0;
+  margin-top: 50px;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 480px;
+  height: 360px;
+  padding: 0px;
+}
+
+.video-container.visible {
+  opacity: 1;
+}
+
+/* InterviewCandidateAnalysis page styles stars here */
+
+.interview-analysis {
+  border: 2px solid #007fd4aa;
+  display: flex;
+  flex: 1;
+  padding: 5px 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #411d7aaa;
+  gap: 10px;
+}
+
+.emoji-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 5px;
+  background-color: white;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.tsk-progress-bar-container {
+  height: 25px;
+  min-width: 82vw;
+  padding: 1.5px;
+  border-radius: 4px;
+  border: 2px solid #165421;
+}
+
+.tsk-progress-bar {
+  min-height: 100%;
+  transform: translate(0px, calc(-100%));
+  background-color: #2ca945;
+  border-radius: 3px;
+  color: #323232;
+  overflow: hidden;
+}
+
+.tsk-progress-prercent.cont {
+  transform: translate(3px, 0);
+  margin-left: 40.5vw;
+  color: #222222;
+}
+
+.tsk-progress-prercent.inside-bar {
+  position: absolute;
+  margin-left: 40.5vw;
+  color: white;
+}
+
+.audio-result-container {
+  padding: 10px;
+  margin: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+  border: 2px solid #007fd4aa;
+  border-radius: 4px;
+}
+
+.sample-interview-div {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}

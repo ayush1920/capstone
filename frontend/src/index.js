@@ -8,12 +8,16 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import PageManager from './Components/PageManager';
 import ProtectedRoutes from './Components/ProtectedRoutes';
+
 import CandidateJobs from './pages/CandidateJobs';
 import CandidateProfile from './pages/CandidateProfile';
+import CandidateJobDetails from './pages/CandidateJobDetails';
+import CandidateInterviewPage from './pages/CandidateInterviewPage';
+
 import InterviewerPosts from './pages/InterviewerPosts';
 import InterviewerCandProfile from './pages/InterviewerCandProfile';
 import InterviewerOpening from './pages/InterviewerOpening';
-import CandidateJobDetails from './pages/CandidateJobDetails';
+import InterviewerCandidateAnalysis from './pages/InterviewerCandidateAnalysis';
 
 const root = createRoot(
   document.getElementById('root')
@@ -59,6 +63,17 @@ root.render(
             <Route exact path='/postOpening' element={
             <ProtectedRoutes>
               <InterviewerOpening />
+            </ProtectedRoutes>} />
+
+
+            <Route exact path='/candidateInterview' element={
+            <ProtectedRoutes>
+              <CandidateInterviewPage />
+            </ProtectedRoutes>} />
+
+            <Route exact path='/CandidateAnalysis' element={
+            <ProtectedRoutes>
+              <InterviewerCandidateAnalysis />
             </ProtectedRoutes>} />
 
         </Routes>

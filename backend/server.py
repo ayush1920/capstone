@@ -2,10 +2,13 @@ import os
 from flask import Flask, request, session, make_response, render_template, send_from_directory
 from flask_cors import CORS, cross_origin
 
-from utils import cprint, unique_filename
 import db_actions
+from store import task_store
 from job_manager import job_manager
 from resume_similarity import start_similary
+from speech_analyzer import analize_audio
+from video_analyzer import emotion_analyse
+from utils import cprint, unique_filename
 
 app = Flask(__name__)
 app.secret_key = 'dkald@2390'
@@ -30,7 +33,8 @@ def login_user():
     except:
         return {'msg': 'wrong parameters'}, 400
     response = db_actions.authenticate_user(username, password)
-    if response[0]['isValid']:
+    
+    if response[1] == 200:
         for key in response[0]['userData']:
             session[key] = response[0]['userData'][key]
 
@@ -68,6 +72,21 @@ def set_interview_status():
         return {'msg': 'Invalid parameters'}, 400
 
     return db_actions.set_interview_status(_id, value)
+
+
+@app.route('/set_interview_complete', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def set_interview_completed():
+    _id = request.args.get('_id', None)
+    username = session.get('username', None)
+    
+    if not username:
+        return {'msg': 'Authentication error'}, 401
+
+    if not(_id):
+        return {'msg': 'Invalid parameters'}, 400
+
+    return db_actions.set_interview_completed(_id)
 
 
 @app.route('/job_list', methods=['GET'])
@@ -242,6 +261,59 @@ def get_task_status():
     if not task_id:
         return {'msg': 'Task Id not provided'}, 400
     return job_manager.get_status(task_id)
+
+@app.route('/scheduleCandidateInterview', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def schedule_candidate_interview():
+    payload = request.json
+    if not payload:
+        return {'msg': 'No payload provided'}, 400
+    return db_actions.schedule_candidate_interview(payload)
+
+@app.route('/initializeInterviewStream', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def initializeInterviewStream():
+    interview_id = request.args.get('interview_id')
+    stream_id = task_store.create_stream_file(interview_id)
+    cprint(stream_id)
+    return stream_id
+
+@app.route('/postBlob', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def postBlob():
+    blob_data = request.files['blob_data'].read()
+    stream_id = request.form.get('stream_id')
+    task_store.store[stream_id].write_stream(blob_data)
+    return 'success'
+
+@app.route('/getInterviewVideo', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def serverInterviewVideo():
+    file_path = request.args.get('file_path')
+    return send_from_directory(*os.path.split(file_path), mimetype='video/webm')
+
+
+@app.route('/analyzeCandidateInterview', methods = ['GET'])
+@cross_origin(supports_credentials=True)
+def analyzeCandidateInterview():
+    file_path = request.args.get('filePath', None)
+    if not file_path:
+        return {'msg': 'File Path not found'}, 400
+    job_manager.terminate_all()
+    task_id = job_manager.add_job(emotion_analyse, file_path, attach_handler = True)
+    return task_id
+    
+    
+@app.route('/analizeCanadidateAudio', methods = ['GET'])
+@cross_origin(supports_credentials=True)
+def analizeCanadidateAudio():
+    file_path = request.args.get('filePath', None)
+    if not file_path:
+        return {'msg': 'File Path not found'}, 400
+    job_manager.terminate_all()
+    task_id = job_manager.add_job(analize_audio, file_path)
+    return task_id
+
 
 if __name__ == '__main__':
     app.run(debug=True)

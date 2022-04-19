@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom'
 import Footer from '../Components/Footer'
 import Navbar, { linkList } from '../Components/Navbar'
 import { getJobData } from '../js/httpHandler'
+import { useNotifier } from '../js/utils'
 
 const CandidateJobDetails = () => {
     const { state } = useLocation();
+    const notifier = useNotifier();
     const [jobData, setJobData] = useState(
         {
             "_id": "",
@@ -23,7 +25,7 @@ const CandidateJobDetails = () => {
     );
 
     const getJobDetails = async (_id) => {
-        const response = await getJobData(_id);
+        const response = await getJobData(notifier, _id);
         if (response) {
             setJobData(response);
         }

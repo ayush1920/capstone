@@ -14,7 +14,7 @@ export const updateLogin = (data) =>{
 }
 
 export const clearUserCred = () =>{
-    const payload = {username:'', isInterviewer:false, loggedIn: false}
+    const payload = {username:'', isInterviewer:false, name:'',loggedIn: false}
     return {
         type: 'UPDATE_USER_DETAILS',
         payload: payload,

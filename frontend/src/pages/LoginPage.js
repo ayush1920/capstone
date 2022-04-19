@@ -12,9 +12,9 @@ import { loginUser } from '../js/httpHandler'
 
 
 const LoginPage = () => {
-    const notifier = useNotifier();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const notifier = useNotifier();
     const userRef = useRef();
     const passRef = useRef();
 
@@ -25,7 +25,7 @@ const LoginPage = () => {
         const candidate_cred = {username: 'hari_vilas', password: 'hari@123'};
         const company1_cred = {username: 'company1', password: 'comp1@123'};
         const company2_cred = {username: 'company2', password: 'comp2@123'};
-        loginUser(company1_cred, dispatch, notifier, navigate);
+        loginUser(notifier, candidate_cred, dispatch, navigate);
     }
 
     return (

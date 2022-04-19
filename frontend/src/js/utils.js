@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
-import { useDispatch } from "react-redux";
+import { useEffect, useRef, useState, useLayoutEffect } from "react"
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { notify, clearUserCred } from "../redux/actions/actions";
 
@@ -48,20 +48,28 @@ export const formatRupee = (_number) => {
 export const useLogout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [triggerNavigation, setTriggerNavigation] = useState(false);
+  const updateUserCred = () => new Promise((resolve, reject) => {
+    dispatch(clearUserCred());
+    resolve();
+  });
+  const [initalTrigger, setInitialTrigger] = useState(false);
+
   useEffect(() => {
-    if (triggerNavigation){
-      
+    if (initalTrigger) {
+      setInitialTrigger(false);
+      navigate('/', { state: { disableRedirect: true } });
     }
-      
-  }, [triggerNavigation]);
+  }, [initalTrigger])
 
   const logout = () => {
     // https://stackoverflow.com/a/27374365
     document.cookie.split(";").forEach(function (c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
     localStorage.removeItem('session');
-    dispatch(clearUserCred());
-    navigate('/', { state: { disableRedirect: true } });
-  }
+    updateUserCred();
+    if (!initalTrigger) {
+      setInitialTrigger(true)
+    }
+  };
+
   return logout;
 }

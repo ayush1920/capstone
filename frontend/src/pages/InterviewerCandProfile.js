@@ -3,13 +3,18 @@ import Navbar, { linkList } from '../Components/Navbar'
 import Footer from '../Components/Footer'
 import { useLocation } from 'react-router-dom'
 import { getCandidateProfile, getTaskStatus, analizeCanadidateResume } from '../js/httpHandler'
-import { formatRupee } from '../js/utils'
+import { formatRupee, useNotifier } from '../js/utils'
 
 const InterviewerCandProfile = (props) => {
 
     const { state } = useLocation();
+    const notifier = useNotifier();
     const { username, job_id, role } = (state && state.username) ? state : { username: '', job_id: '', role: '' }
     const [intervalRunning, setIntervalRunning] = useState(false);
+    const [resumeAnalysisText, setResumeAnalysisText] = useState('');
+    const isResumeUploaded = () => { return (userData.resume_location.constructor === String && userData.resume_location !== '') };
+
+
     const [userData, setUserData] = useState(
         {
             first_name: '',
@@ -25,11 +30,10 @@ const InterviewerCandProfile = (props) => {
             profile_image: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png',
         })
 
-    const [resumeAnalysisText, setResumeAnalysisText] = useState('')
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const profileData = await getCandidateProfile(username);
+            const profileData = await getCandidateProfile(notifier, username);
             if (profileData.constructor === Array && profileData.length === 0)
                 return
             setUserData(profileData);
@@ -37,12 +41,10 @@ const InterviewerCandProfile = (props) => {
         fetchUserProfile();
     }, []);
 
-    const isResumeUploaded = () => { return (userData.resume_location.constructor === String && userData.resume_location !== '') };
-
     const analizeResume = async () => {
         // Add Interval counter if not exists
         if (!intervalRunning) {
-            const task_id = await analizeCanadidateResume(username, job_id);
+            const task_id = await analizeCanadidateResume(notifier, username, job_id);
             if (!task_id)
                 {
                     console.error("Task couldn't be created.")
@@ -52,7 +54,7 @@ const InterviewerCandProfile = (props) => {
             // Main intervel. Runs every 2 second to check for job status.
             const _intervalCounter = setInterval(async() => {
                 setResumeAnalysisText('Analizing ...')
-                const response = await getTaskStatus(task_id);
+                const response = await getTaskStatus(notifier, task_id);
 
                 if (!(response && response.status)){
                     console.error('No response status found')

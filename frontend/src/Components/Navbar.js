@@ -56,7 +56,7 @@ const Navbar = (props) => {
                     </div>
                 </div>}
             </div>
-            <Notifier />
+            <AlertBar />
         </div>
 
     )
@@ -72,8 +72,8 @@ export const linkList = {
 
 Object.freeze(linkList)
 
-const Notifier = () => {
-    const msgData = useSelector(state => state.mainReducer);
+const AlertBar = () => {
+    const msgData = useSelector(state => state.notifierReducer);
     const firstMount = useIsMount();
     const [className, setClassName] = useState('notifier');
 
@@ -88,7 +88,7 @@ const Notifier = () => {
         setTimeout(() => {
             setClassName('notifier')
         }, 5000);
-    }
+    };
 
     return (
         <div className={className}>

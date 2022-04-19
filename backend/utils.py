@@ -13,3 +13,6 @@ def unique_filename(extension, directory = None):
         while(os.path.isfile(os.path.join(directory, file_name))):
             file_name = gen_file_name()
     return file_name
+
+def unique_id():
+    return str(uuid.uuid1())

@@ -3,7 +3,8 @@ import { updateLogin } from '../redux/actions/actions'
 
 const BASE_URL = 'http://localhost:5000';
 
-const postRequest = async (_url, payload, isJson = true) => {
+
+const PostRequest = async (_url, payload, isJson = true) => {
     const url = BASE_URL + _url
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -11,7 +12,6 @@ const postRequest = async (_url, payload, isJson = true) => {
 
     if (isJson)
         headers['Content-Type'] = 'application/json';
-
     return await axios.post(url, payload,
         {
             withCredentials: true,
@@ -21,14 +21,15 @@ const postRequest = async (_url, payload, isJson = true) => {
             return { status: true, response: res.data }
         })
         .catch(err => {
-            if (err.response && err.response.status)
-                return { status: false, msg: 'Incorrent username or password' }
-            return { status: false, msg: 'Network or server error' }
+            if (err.response && err.response.status && err.response.data) {
+                return { status: false, msg: err.response.data.msg }
+            }
+            return { status: false, msg: 'Error in network connection' }
         })
 }
 
 
-const getRequest = async (_url, params = null) => {
+const GetRequest = async (_url, params = null) => {
     const url = BASE_URL + _url;
     const options = {
         withCredentials: true,
@@ -43,81 +44,126 @@ const getRequest = async (_url, params = null) => {
 
     return await axios.get(url, options)
         .then(res => { return { status: true, response: res.data } })
-        .catch((err) => {
-            return { status: false };;
+        .catch(err => {
+            if (err.response && err.response.status && err.response.data) {
+                return { status: false, msg: err.response.data.msg }
+            }
+            return { status: false, msg: 'Error in network connection' }
         })
-
 }
 
-export const loginUser = async (userDetails, dispatch, notifier, navigate) => {
-    const resp = await postRequest('/login_user', userDetails);
-    // Wrong user credentials
-    if (!resp.status)
-        return notifier(resp.msg);
+export const loginUser = async (notifier, userDetails, dispatch, navigate) => {
+    const resp = await PostRequest('/login_user', userDetails);
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
 
-    if (resp.response.isValid) {
+    else{
         dispatch(updateLogin(resp.response.userData));
         localStorage.setItem('session', JSON.stringify(resp.response.userData))
         return navigate('/');
     }
-
 }
 
-export const getCandidateInterview = async () => {
-    const resp = await getRequest('/interview_list');
-    if (!resp.status)
+export const getCandidateInterview = async (notifier) => {
+    const resp = await GetRequest('/interview_list');
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return []
+    }
     return resp.response.interview_data
 }
 
 
-export const getCandidateJobs = async () => {
-    const resp = await getRequest('/job_list');
-    if (!resp.status)
+export const getCandidateJobs = async (notifier) => {
+    const resp = await GetRequest('/job_list');
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return []
+    }
     return resp.response.job_data
 }
 
 
-export const applyJob = async (job_id) => {
-    return getRequest('/apply_job', { 'job_id': job_id });
-}
-
-export const withdrawApplication = async (job_id) => {
-    return getRequest('/withdrawApplication', { 'job_id': job_id });
-}
-
-export const getCompanyInterview = async () => {
-    const resp = await getRequest('/interview_company_list');
-    if (!resp.status)
+export const applyJob = async (notifier, job_id) => {
+    const resp = await GetRequest('/apply_job', { 'job_id': job_id });
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return []
+    }
+    return resp.response;
+}
+
+export const withdrawApplication = async (notifier, job_id) => {
+    const resp = await GetRequest('/withdrawApplication', { 'job_id': job_id });
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return []
+    }
+    return resp.response
+}
+
+export const getCompanyInterview = async (notifier) => {
+    const resp = await GetRequest('/interview_company_list');
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return []
+    }
     return resp.response.interview_data
 }
 
-export const setInterviewStatus = async (_id, isEnabled) => {
-    return getRequest('/set_interview_status', { '_id': _id, value: isEnabled });
+export const setInterviewStatus = async (notifier, _id, isEnabled) => {
+    const resp = await GetRequest('/set_interview_status', { '_id': _id, value: isEnabled });
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response
+}
+export const setInterviewComplete = async (notifier, _id) => {
+    const resp = await GetRequest('/set_interview_complete', { '_id': _id })
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response
 }
 
-export const getInterviewerOpenings = async () => {
-    const resp = await getRequest('/openingsPosted');
-    if (!resp.status)
+export const getInterviewerOpenings = async (notifier,) => {
+    const resp = await GetRequest('/openingsPosted');
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return []
+    }
     return resp.response.openings
 }
 
 
-export const getCandidateProfile = async (candidate_username) => {
+export const getCandidateProfile = async (notifier, candidate_username) => {
     const params = {}
     if (candidate_username)
         params['candidate_username'] = candidate_username;
 
-    const resp = await getRequest('/candidateProfile', params);
-    if (!resp.status)
+    const resp = await GetRequest('/candidateProfile', params);
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return []
+    }
     return resp.response.profile
 }
 
-export const uploadCandidateResume = async (file) => {
+export const uploadCandidateResume = async (notifier, file) => {
     const formData = new FormData();
     formData.append(
         "resume",
@@ -125,47 +171,111 @@ export const uploadCandidateResume = async (file) => {
         file.name
     );
 
-    const resp = await postRequest('/uploadResume', formData);
+    const resp = await PostRequest('/uploadResume', formData);
     if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return ''
     }
-    console.log(resp.response)
     return resp.response.resume_location
 }
 
-export const modifyJob = async (job_data) => {
-    const resp = await postRequest('/modifyJob', job_data)
+export const modifyJob = async (notifier, job_data) => {
+    const resp = await PostRequest('/modifyJob', job_data)
     if (!resp.status) {
-        return {}
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
     }
     return resp.response.jobRecord
 }
 
-export const deleteJob = async (job_id) => {
-    const resp = await getRequest('/deleteJob', { 'job_id': job_id })
-    if (!resp.status)
+export const deleteJob = async (notifier, job_id) => {
+    const resp = await GetRequest('/deleteJob', { 'job_id': job_id })
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return ''
+    }
     return resp.response
 }
 
-export const getJobData = async (job_id) => {
-    const resp = await getRequest('/getJobData', { 'job_id': job_id })
-    if (!resp.status)
+export const getJobData = async (notifier, job_id) => {
+    const resp = await GetRequest('/getJobData', { 'job_id': job_id })
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return {}
+    }
     return resp.response
 }
 
-export const analizeCanadidateResume = async (candidate_username, job_id) => {
-    const resp = await postRequest('/processResumeJob', { 'candidate_usernmae': candidate_username, 'job_id': job_id })
-    if (!resp.status)
+export const analizeCanadidateResume = async (notifier, candidate_username, job_id) => {
+    const resp = await PostRequest('/processResumeJob', { 'candidate_usernmae': candidate_username, 'job_id': job_id })
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return ''
+    }
     return resp.response
 
 }
 
-export const getTaskStatus = async (task_id) => {
-    const resp = await getRequest('/getTaskStatus', { 'task_id': task_id })
-    if (!resp.status)
+export const getTaskStatus = async (notifier, task_id) => {
+    const resp = await GetRequest('/getTaskStatus', { 'task_id': task_id })
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
         return ''
+    }
     return resp.response
+}
+
+export const scheduleCandidateInterview = async (notifier, payload) => {
+    const resp = await PostRequest('/scheduleCandidateInterview', payload);
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response
+}
+
+export const getStreamId = async (notifier, interview_id) => {
+    const resp = await GetRequest('/initializeInterviewStream', { 'interview_id': interview_id });
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response;
+}
+
+export const sendBlobData = async (notifier, streamId, blob_data) => {
+    const formData = new FormData();
+    formData.append('blob_data', blob_data)
+    formData.append('stream_id', streamId)
+    PostRequest('/postBlob', formData);
+}
+
+export const analizeCanadidateVideo = async (notifier, video_path) => {
+    const resp = await GetRequest('/analyzeCandidateInterview', { 'filePath':  video_path})
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response
+
+}
+
+export const analizeCanadidateAudio = async (notifier, video_path) => {
+    const resp = await GetRequest('/analizeCanadidateAudio', { 'filePath':  video_path})
+    if (!resp.status) {
+        if (resp.msg)
+            notifier(resp.msg)
+        return ''
+    }
+    return resp.response
+
 }

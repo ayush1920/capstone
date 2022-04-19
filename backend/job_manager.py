@@ -1,7 +1,7 @@
 # Creates a queue of Jobs and return response when asked for status or result.
 
 # Not a production level code. Will lose state when program is closed.
-# Not a persistant, relaible way of hadling jobs in server.
+# Not a persistent, relaible way of hadling jobs in server.
 
 import asyncio
 import threading
@@ -12,13 +12,24 @@ from string import ascii_lowercase, digits
 
 from utils import cprint
 
+
+class ProgressHandler:
+    def __init__(self):
+        self.status = {}
+        self.interrupt = False
+
 class Job:
-    def __init__(self, _id, job_func, *args, **kwargs):
+    def __init__(self, _id, job_func,*args, **kwargs):
         self.status = -2  # -2 Not started, -1 Failed, 0 Running, 1 Success
         self._id = _id
         self.job_func = job_func
         self.args = args
         self.kwargs = kwargs
+        self.handler = None
+        if ('attach_handler' in kwargs and kwargs['attach_handler']):
+            self.handler = ProgressHandler()
+            self.kwargs['handler'] = self.handler
+            del kwargs['attach_handler']
 
     def run_job(self):
         self.status = 0
@@ -34,16 +45,22 @@ class Job:
 
     def get_job_status(self):
         response = {'status': 'Success'}
-
+ 
         if self.status == -1:
             response['status'] = 'Failed'
+        
         elif self.status == 0 or self.status == -2:
             response['status'] = 'Running'
+            if self.handler:
+                response['progress'] = self.handler.status
         else:
             response['result'] = self.result
 
         return response
 
+    def interrupt_process(self):
+        self.handler.interrupt = True
+    
 
 class JOB_Manager:
     new_job_id = lambda x: "".join(choices(ascii_lowercase + digits, k=8))
@@ -98,5 +115,11 @@ class JOB_Manager:
                 del job_id
 
             await asyncio.sleep(.5)
+    
+    def terminate_all(self):
+        for job_id in self.job_list:
+            self.job_list[job_id].interrupt_process()
+
+    
 
 job_manager = JOB_Manager()
