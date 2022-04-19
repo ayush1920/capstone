@@ -269,7 +269,7 @@ const InterviewerCandidateAnalysis = ({ candidate_username, video_path, job_id, 
 
                                 <div className='emoji-container' >
                                     <img height={60} width={60} src={happy_image} />
-                                    <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.ha}</span>
+                                    <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.Happy}</span>
 
                                     <img height={38} width={38} src={neutral_image} />
                                     <span style={{ fontSize: '1.8rem' }}>{analysisProgress.label.Neutral}</span>
